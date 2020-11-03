@@ -1,13 +1,21 @@
 import firebase from "firebase";
-
+import {
+  apiKey,
+  appId,
+  authDomain,
+  databaseURL,
+  messagingSenderId,
+  projectId,
+  storageBucket,
+} from "./fireconfig.json";
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey,
+  authDomain,
+  databaseURL,
+  projectId,
+  storageBucket,
+  messagingSenderId,
+  appId,
 };
 
 export const initfirebase = firebase.initializeApp(firebaseConfig);
@@ -17,9 +25,7 @@ export default class firebaseAuth {
     try {
       let provider = new firebase.auth.GoogleAuthProvider();
       let result = null;
-      result = await initfirebase
-        .auth()
-        .signInWithPopup(provider);
+      result = await initfirebase.auth().signInWithPopup(provider);
 
       let user = result.user;
       localStorage.setItem(
@@ -29,7 +35,7 @@ export default class firebaseAuth {
           token: result.credential.accessToken,
           email: result.user.email,
           avatar: result.user.photoURL,
-          id: result.user.uid
+          id: result.user.uid,
         })
       );
     } catch (error) {

@@ -2,9 +2,9 @@
   <footer class="footer">
     <div class="content has-text-centered">
       <p>
-        <strong>SecureBank</strong> by
-        <a href="https://orbis25.github.io/Personal-Site/index.html">Orbis Alonzo Gutierrez</a>
-        {{day}}
+        <strong>SecureBank</strong>
+        <a href="https://orbis25.github.io/Personal-Site/index.html"> </a>
+        {{ day }}
       </p>
     </div>
   </footer>
@@ -16,14 +16,14 @@ export default {
   data: () => {
     return {
       day: `${new Date().getDate()}/${new Date().getMonth() +
-        1}/${new Date().getFullYear()}`
+        1}/${new Date().getFullYear()}`,
     };
-  }
+  },
 };
 </script>
 
 <style>
-footer{
-  bottom:0;
+footer {
+  bottom: 0;
 }
 </style>
