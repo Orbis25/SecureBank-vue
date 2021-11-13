@@ -13,12 +13,30 @@
           <option value="20">20 por pagina</option>
         </b-select>
         <div class="control">
-          <button class="button" @click="currentPage = 2;isCardModalActive = true">Nueva</button>
+          <button
+            class="button"
+            @click="
+              currentPage = 2;
+              isCardModalActive = true;
+            "
+          >
+            Nueva
+          </button>
         </div>
       </b-field>
 
+      <div class="control" style="margin: 10px;">
+        <b-field>
+          <b-input
+            v-model="searchText"
+            placeholder="busqueda"
+            rounded
+          ></b-input>
+        </b-field>
+      </div>
+
       <b-table
-        :data="data"
+        :data="filteredData"
         :paginated="isPaginated"
         :per-page="perPage"
         :current-page.sync="currentPage"
@@ -35,8 +53,14 @@
             field="companyName"
             label="Nombre de Aplicacion"
             sortable
-          >{{ props.row.companyName }}</b-table-column>
-          <b-table-column field="date" label="Fecha de creacion" sortable centered>
+            >{{ props.row.companyName }}</b-table-column
+          >
+          <b-table-column
+            field="date"
+            label="Fecha de creacion"
+            sortable
+            centered
+          >
             <span class="tag is-success">{{ props.row.createdAt }}</span>
           </b-table-column>
 
@@ -56,10 +80,15 @@
               <span>eliminar</span>
             </button>
           </b-table-column>
-          <b-loading :is-full-page="false" :active.sync="isLoadingTable" :can-cancel="false"></b-loading>
+          <b-loading
+            :is-full-page="false"
+            :active.sync="isLoadingTable"
+            :can-cancel="false"
+          ></b-loading>
         </template>
       </b-table>
     </section>
+
     <section>
       <b-modal :active.sync="isCardModalActive" :width="640" scroll="keep">
         <div class="card">
@@ -87,13 +116,17 @@
 
             <div class="content">
               Tu contraseña siempre estara segura con nosotros!
-              <small>{{new Date().toLocaleDateString()}}</small>
+              <small>{{ new Date().toLocaleDateString() }}</small>
             </div>
           </div>
         </div>
-        <b-loading :is-full-page="false" :active.sync="isLoading" :can-cancel="false"></b-loading>
+        <b-loading
+          :is-full-page="false"
+          :active.sync="isLoading"
+          :can-cancel="false"
+        ></b-loading>
       </b-modal>
-      <Detail :info="infoPass"/>
+      <Detail :info="infoPass" />
     </section>
   </div>
 </template>
@@ -101,12 +134,13 @@
 <script>
 import firebaseService from "../../services/firebaseService";
 import uid from "uuid";
-import criptojs from "crypto-js";
 import Detail from "../../components/password/ModalView";
 import { mapMutations } from "vuex";
+import { encrypt, decrypt } from "../../helpers/encript-helper";
+
 export default {
   components: {
-    Detail
+    Detail,
   },
   data() {
     return {
@@ -114,10 +148,10 @@ export default {
       firebaseData: [],
       form: {
         id: uid(),
-        password: null,
-        companyName: null,
+        password: "",
+        companyName: "",
         createdAt: new Date().toLocaleDateString(),
-        key: null
+        key: "",
       },
       infoPass: null,
       isLoading: false,
@@ -125,78 +159,97 @@ export default {
       isPaginationSimple: false,
       defaultSortDirection: "asc",
       currentPage: 1,
-      perPage: 5,
+      perPage: 20,
       isCardModalActive: false,
-      isLoadingTable: false
+      isLoadingTable: false,
+      searchText: "",
     };
   },
-  created() {
-    this.getAll();
+  async created() {
+    await this.getAll();
   },
   methods: {
     ...mapMutations(["changeStateModal", ""]),
-    getAll() {
+    async getAll() {
       this.isLoadingTable = true;
-      let service = new firebaseService().getAll();
-      service
-        .then(r => {
-          let data = [];
-          let objects = Object.values(r.val());
-          this.firebaseData = Object.keys(r.val());
-          for (let i = 0; i < objects.length; i++) {
-            data.push({
-              id: objects[i].id,
-              createdAt: objects[i].createdAt,
-              companyName: objects[i].companyName,
-              key: this.firebaseData[i]
-            });
-          }
-          this.data = data;
-        })
-        .finally(() => (this.isLoadingTable = false));
+
+      try {
+        let response = await new firebaseService().getAll();
+        const values = response.val();
+
+        if (values !== null) {
+          const objects = Object.values(values);
+          this.firebaseData = Object.keys(values);
+          this.data = objects.map(({ id, createdAt, companyName }, index) => {
+            return {
+              id,
+              createdAt,
+              companyName,
+              key: this.firebaseData[index],
+            };
+          });
+        }
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        this.isLoadingTable = false;
+      }
     },
-    add() {
+
+    async add() {
       if (this.form.password != null && this.form.companyName != null) {
         this.isLoading = true;
-        let service = new firebaseService();
-        this.form.password = this.encrypt(this.form.password);
-        service
-          .add(this.form)
-          .then(() => {
-            this.$toast.open({
-              message: "Agregado correctamente!",
-              type: "is-success"
-            });
-            this.getAll();
-          })
-          .catch(() => {
-            this.$toast.open({
-              message: `Lo sentimos ha ocurrido un error`,
-              type: "is-danger"
-            });
-          })
-          .finally(() => {
-            this.isCardModalActive = false;
-            this.isLoading = false;
-            this.form.password = null;
-            this.form.companyName = null;
+        const service = new firebaseService();
+
+        this.form.password = encrypt(this.form.password);
+
+        try {
+          await service.add(this.form);
+          this.$toast.open({
+            message: "Agregado correctamente!",
+            type: "is-success",
           });
+          this.getAll();
+        } catch (error) {
+          this.$toast.open({
+            message: `Lo sentimos ha ocurrido un error ${error.message}`,
+            type: "is-danger",
+          });
+        } finally {
+          this.isCardModalActive = false;
+          this.isLoading = false;
+          this.form.password = "";
+          this.form.companyName = "";
+        }
       } else {
         this.$toast.open({
           message: `Porfavor llene los campos`,
-          type: "is-danger"
+          type: "is-danger",
         });
       }
     },
+
     async findById(id) {
       this.changeStateModal(true); //open modal
       let service = new firebaseService();
-      await service.findById(id).then(r => {
-        this.infoPass = r.val();
-        this.infoPass.key = id;
-        this.infoPass.password = this.decrypt(this.infoPass.password);
-      });
+
+      try {
+        let response = await service.findById(id);
+        let object = response.val();
+        this.infoPass = {
+          id: object.id,
+          companyName: object.companyName,
+          password: decrypt(object.password),
+          createdAt: object.createdAt,
+        };
+      } catch (error) {
+        this.$toast.open({
+          message: `Lo sentimos ha ocurrido un error ${error.message}`,
+          type: "is-danger",
+        });
+      }
     },
+
     remove(id) {
       this.$dialog.confirm({
         title: "Eliminando Elemento",
@@ -208,17 +261,17 @@ export default {
           service.remove(id);
           this.$toast.open("Eliminado!");
           this.getAll();
-        }
+        },
       });
     },
-    encrypt(value) {
-      return criptojs.AES.encrypt(value, "").toString();
-    },
-    decrypt(value) {
-      return criptojs.AES.decrypt(value.toString(), "").toString(
-        criptojs.enc.Utf8
+  },
+
+  computed: {
+    filteredData() {
+      return this.data.filter((item) =>
+        item.companyName.toLowerCase().includes(this.searchText.toLowerCase())
       );
-    }
-  }
+    },
+  },
 };
 </script>

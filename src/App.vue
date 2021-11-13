@@ -1,20 +1,21 @@
 <template>
   <div id="app">
-    <Navbar/>
+    <Navbar />
     <div class="content">
-      <router-view/>
+      <router-view />
     </div>
-    <Foot/>
+    <footer-custom />
   </div>
 </template>
 <script>
 import Navbar from "./components/shared/Navbar";
-import Foot from './components/shared/Footer';
+import Foot from "./components/shared/Footer";
+
 export default {
   components: {
     Navbar,
-    Foot
-  }
+    "footer-custom": Foot,
+  },
 };
 </script>
 <style>
@@ -33,7 +34,7 @@ export default {
 .mt-5 {
   margin-top: 5em;
 }
-*{
+* {
   padding: 0;
   margin: 0;
 }

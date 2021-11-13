@@ -1,25 +1,25 @@
 import firebase from "firebase";
 
-export default class firebaseService {
+export default class FirebaseService {
   uidUser;
   constructor() {
     this.uidUser = JSON.parse(localStorage.getItem("session")).id;
   }
 
-  getAll() {
+  async getAll() {
     return firebase
       .database()
       .ref(this.uidUser)
       .once("value");
   }
 
-  add(model) {
+  async add(model) {
     let ref = firebase.database().ref(this.uidUser);
     return ref.push(model);
   }
 
   async findById(id) {
-    return await firebase
+    return firebase
       .database()
       .ref(`${this.uidUser}/${id}`)
       .once("value");
@@ -32,8 +32,11 @@ export default class firebaseService {
       .remove();
   }
 
-  edit(model) {
-    let ref = firebase.database().ref(`${this.uidUser}`).child(`${model.key}`);
-    return ref.update(model)
+  async edit(model) {
+    let ref = firebase
+      .database()
+      .ref(`${this.uidUser}`)
+      .child(`${model.key}`);
+    return ref.update(model);
   }
 }

@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: "footer",
+  name: "footer-custom",
   data: () => {
     return {
       day: `${new Date().getDate()}/${new Date().getMonth() +

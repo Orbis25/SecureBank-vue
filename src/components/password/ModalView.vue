@@ -1,6 +1,11 @@
 <template>
   <section>
-    <b-modal :active.sync="isVisible" @close="changeStateModal(false)" :width="640" scroll="keep">
+    <b-modal
+      :active.sync="isVisible"
+      @close="changeStateModal(false)"
+      :width="640"
+      scroll="keep"
+    >
       <div class="card">
         <div class="card-content">
           <div class="media">
@@ -26,13 +31,15 @@
                     v-if="isVisible"
                   ></b-input>
                 </b-field>
-                <b-button type="is-success" @click="update()" v-if="isDisable">Guardar cambios</b-button>
+                <b-button type="is-success" @click="update()" v-if="isDisable"
+                  >Guardar cambios</b-button
+                >
               </div>
             </div>
           </div>
           <div class="content">
             Recuerda contraseña siempre estara segura con nosotros
-            <small>{{new Date().toLocaleDateString()}}</small>
+            <small>{{ new Date().toLocaleDateString() }}</small>
           </div>
         </div>
       </div>
@@ -44,54 +51,53 @@
 /* eslint-disable */
 import { mapMutations, mapState } from "vuex";
 import firebaseService from "../../services/firebaseService";
-import criptojs from "crypto-js";
+import { encrypt } from "../../helpers/encript-helper";
+
 export default {
   name: "modalview",
   props: {
     info: Object,
-    state: Boolean
+    state: Boolean,
   },
   data: () => {
     return {
-      isDisable: false
+      isDisable: false,
     };
   },
   methods: {
     ...mapMutations(["changeStateModal", ""]),
-    update() {
+    async update() {
       let service = new firebaseService();
-      this.info.password = this.encrypt(this.info.password);
-      service
-        .edit(this.info)
-        .then(() => {
-          this.$toast.open({
-            message: "Actualizado correctamente",
-            type: "is-success"
-          });
-          this.changeStateModal(false);
-        })
-        .catch(e =>
-          this.$toast.open({
-            message:
-              "Ha ocurrido un error al actualizar lo sentimos, error :" + e,
-            type: "is-danger"
-          })
-        );
+      this.info.password = encrypt(this.info.password);
+
+      try {
+        await service.updateApp(this.info);
+        this.changeStateModal(false);
+        this.$toast.open({
+          message: "Actualizado correctamente",
+          type: "is-success",
+        });
+        this.changeStateModal(false);
+      } catch (error) {
+        this.$toast.open({
+          message:
+            "Ha ocurrido un error al actualizar lo sentimos, error :" +
+            error.message,
+          type: "is-danger",
+        });
+      }
     },
-    encrypt(value) {
-      return criptojs.AES.encrypt(value, "").toString();
-    }
   },
+
   computed: {
     ...mapState({
-      visible: state => state.modelvisible
+      visible: (state) => state.modelvisible,
     }),
     isVisible() {
       return this.visible;
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
-</style>
+<style></style>

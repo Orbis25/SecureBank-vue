@@ -9,11 +9,12 @@ import store from "./store";
 Vue.use(Buefy);
 Vue.config.productionTip = false;
 
+
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!localStorage.getItem("session")) {
       next({
-        path: "/"
+        path: "/",
       });
     } else {
       next();
@@ -26,5 +27,5 @@ router.beforeEach((to, from, next) => {
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount("#app");
