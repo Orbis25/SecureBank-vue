@@ -71,7 +71,7 @@ export default {
       this.info.password = encrypt(this.info.password);
 
       try {
-        await service.updateApp(this.info);
+        await service.edit(this.info);
         this.changeStateModal(false);
         this.$toast.open({
           message: "Actualizado correctamente",
