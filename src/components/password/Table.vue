@@ -241,6 +241,7 @@ export default {
           companyName: object.companyName,
           password: decrypt(object.password),
           createdAt: object.createdAt,
+          key: response.ref.key,
         };
       } catch (error) {
         this.$toast.open({

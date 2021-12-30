@@ -1,4 +1,4 @@
-import firebase from "firebase";
+import firebase from "firebase/compat";
 
 export const firebaseConfig = {
   apiKey: process.env.VUE_APP_API_KEY,
