@@ -62,7 +62,6 @@ export default {
   data: () => {
     return {
       isDisable: false,
-      visible: false,
     };
   },
   methods: {
@@ -73,7 +72,7 @@ export default {
 
       try {
         await service.edit(this.info);
-        console.log(this.info)
+        console.log(this.info);
         this.changeStateModal(false);
         this.$toast.open({
           message: "Actualizado correctamente",
