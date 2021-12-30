@@ -72,7 +72,6 @@ export default {
 
       try {
         await service.edit(this.info);
-        console.log(this.info);
         this.changeStateModal(false);
         this.$toast.open({
           message: "Actualizado correctamente",
