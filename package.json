@@ -13,7 +13,7 @@
     "core-js": "^2.6.5",
     "firebase": "^9.6.1",
     "firebaseui": "^4.0.0",
-    "resolve-url-loader": "^3.1.0",
+    "resolve-url-loader": "^5.0.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "uuid": "^3.3.2",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-plugin-eslint": "^3.8.0",
-    "@vue/cli-service": "^3.8.0",
+    "@vue/cli-service": "^5.0.8",
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
